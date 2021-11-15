@@ -172,7 +172,12 @@ class ICUBase(ConanFile):
         prefix = self.package_folder.replace("\\", "/")
         arch64 = ['x86_64', 'sparcv9', 'ppc64', 'ppc64le', 'armv8', 'armv8.3', 'mips64']
         bits = "64" if self.settings.arch in arch64 else "32"
-        args = [self._platform,
+        #  workaround for cross-building case: build=Linux/gcc(x86_64), host=Linux/gcc(arm)
+        platform = self._platform
+        if tools.cross_building(self) and platform == "Linux/gcc":
+            platform = "Linux"
+
+        args = [platform,
                 "--prefix={0}".format(prefix),
                 "--disable-samples",
                 "--disable-layout",
